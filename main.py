@@ -19,7 +19,6 @@ PASSWORD = "#24680aaA"
 
 #     r = session.post(url, log_params)
 #     r = session.get("https://lk.mirea.ru/learning/debt/")
-#     print(r.url)
 #     return r.text
 
 # with open("index.html", "w", encoding="utf-8") as f:
@@ -70,12 +69,14 @@ def main_info_finder(dolgy):
                     empty_counter += 1
                 elif disc[0] in sheet[f"E{i}"].value:
                     if [sheet[f"{l}{i}"].value for l in "DEFGHIJKLMN"] not in res_list:
-                        res_list.append([sheet[f"{l}{i}"].value for l in "DEFGHIJKLMN"])
+                        res_list.append(i)
             dolgy[kaf][j].append(res_list)
     return dolgy
                     
                 
 def excel_creator(dop_ved_dict):
+    readme_book = openpyxl.load_workbook("README.xlsx")
+
     book = openpyxl.Workbook()
 
     sheet = book.active
@@ -84,17 +85,21 @@ def excel_creator(dop_ved_dict):
     sheet["B1"] = "Дисциплина"
     sheet["C1"] = "Ведомость/допуск"
 
+
+
     i = 1
     for kaf, disc_info in dop_ved_dict.items():
         i += 1
         sheet[f"A{i}"] = kaf
+        readme_sheet = readme_book[kaf]
         for disc in disc_info:
             sheet[f"B{i}"] = disc[0] + " " + disc[1]
             sheet[f"C{i}"] = disc[2]
             for el in disc[3]:
                 l_str = "EFGHIJKLMNO"
+                readme_str = "DEFGHIJKLMN"
                 for j in range(len(l_str)):
-                    sheet[f"{l_str[j]}{i}"] = el[j]
+                    sheet[f"{l_str[j]}{i}"] = readme_sheet[f"{readme_str[j]}{el}"].value
                 i += 1
             i += 1
 
