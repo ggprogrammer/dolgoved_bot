@@ -1,11 +1,13 @@
 import requests as req
 from bs4 import BeautifulSoup
 import openpyxl
+from copy import copy
 
 url = "https://lk.mirea.ru/auth.php"
 
 LOGIN = "sysoev.n.m@edu.mirea.ru"
 PASSWORD = "#24680aaA"
+
 
 # def auth():
 #     session = req.Session()
@@ -100,12 +102,19 @@ def excel_creator(dop_ved_dict):
                 readme_str = "DEFGHIJKLMN"
                 for j in range(len(l_str)):
                     sheet[f"{l_str[j]}{i}"] = readme_sheet[f"{readme_str[j]}{el}"].value
+                    sheet[f"{l_str[j]}{i}"].font = copy(readme_sheet[f"{readme_str[j]}{el}"].font)
+                    sheet[f"{l_str[j]}{i}"].alignment = copy(readme_sheet[f"{readme_str[j]}{el}"].alignment)
+                    sheet[f"{l_str[j]}{i}"].border = copy(readme_sheet[f"{readme_str[j]}{el}"].border)
+                    sheet[f"{l_str[j]}{i}"].fill = copy(readme_sheet[f"{readme_str[j]}{el}"].fill)
+
+                    sheet[f"{l_str[j]}{i}"].number_format = readme_sheet[f"{readme_str[j]}{el}"].number_format
                 i += 1
             i += 1
 
     book.save("results.xlsx")
     book.close()
-            
+
+
 def printer(dop_ved_dict):
     for kaf, disc_info in dop_ved_dict.items():
         print(kaf) 
