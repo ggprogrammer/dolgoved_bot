@@ -3,30 +3,33 @@ from bs4 import BeautifulSoup
 import openpyxl
 from openpyxl.styles import PatternFill, Border, Side
 from copy import copy
+import os
+from tg_sender import run_sender
 
 
 url = "https://lk.mirea.ru/auth.php"
 
-LOGIN = "sysoev.n.m@edu.mirea.ru"
-PASSWORD = "#24680aaA"
+BASE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'Dolgoved')
+READFILE_DIR = os.path.join(BASE_DIR, 'READ_FILE')
 
+def auth():
+    session = req.Session()
+    LOGIN = input("Введите логин: ")
+    PASSWORD = input("Введите пароль: ")
+    log_params = {
+        "AUTH_FORM": "Y",
+        "TYPE": "AUTH",
+        "USER_LOGIN": LOGIN,
+        "USER_PASSWORD": PASSWORD,
+        "USER_REMEMBER": "Y"
+    }
 
-# def auth():
-#     session = req.Session()
-#     log_params = {
-#         "AUTH_FORM": "Y",
-#         "TYPE": "AUTH",
-#         "USER_LOGIN": LOGIN,
-#         "USER_PASSWORD": PASSWORD,
-#         "USER_REMEMBER": "Y"
-#     }
+    r = session.post(url, log_params)
+    r = session.get("https://lk.mirea.ru/learning/debt/")
+    return r.text
 
-#     r = session.post(url, log_params)
-#     r = session.get("https://lk.mirea.ru/learning/debt/")
-#     return r.text
-
-# with open("index.html", "w", encoding="utf-8") as f:
-#     f.write(auth())
+with open("index.html", "w", encoding="utf-8") as f:
+    f.write(auth())
 
 def parser():
     with open("index.html", "r", encoding="utf-8") as f:
@@ -42,7 +45,7 @@ def parser():
         return res
     
 def dop_ved_finder(dolgy):
-    wb = openpyxl.load_workbook("README.xlsx")
+    wb = openpyxl.load_workbook(README_FILE)
     dop_ved_dict = {}
     format_dict = {}
     for sheet in wb.worksheets:
@@ -61,7 +64,7 @@ def dop_ved_finder(dolgy):
     return dop_ved_dict, format_dict
 
 def main_info_finder(dolgy):
-    wb = openpyxl.load_workbook("README.xlsx")
+    wb = openpyxl.load_workbook(README_FILE)
     for kaf, disc_infos in dolgy.items():
         sheet = wb[kaf]
         for j in range(len(disc_infos)):
@@ -92,7 +95,7 @@ def center_el(sheet_el):
     return alignment_obj
 
 def excel_creator(dop_ved_dict, format_dict):
-    readme_book = openpyxl.load_workbook("README.xlsx")
+    readme_book = openpyxl.load_workbook(README_FILE)
     Fill = PatternFill(start_color='DCD0FF',
                    end_color='DCD0FF',
                    fill_type='solid')
@@ -177,9 +180,10 @@ def excel_creator(dop_ved_dict, format_dict):
                 i += 1
             k += 1
             i += 1
-
+    
     book.save("results.xlsx")
     book.close()
+    readme_book.close()
 
 
 def printer(dop_ved_dict):
@@ -194,6 +198,8 @@ def printer(dop_ved_dict):
 
 
 if __name__ == "__main__":
+    data_file = run_sender()
+    README_FILE = os.path.join(READFILE_DIR, data_file)
     dolgy = parser()
     dolgy = [f'{i[0]} ({i[1]})' for i in dolgy]
     temp_tup = dop_ved_finder(dolgy)

@@ -3,3 +3,6 @@ results.xlsx
 ~$results.xlsx
 ~$README.xlsx
 index.html
+anon.session
+__pycache__/tg_sender.cpython-313.pyc
+READ_FILE/Расписание пересдач.xlsx
